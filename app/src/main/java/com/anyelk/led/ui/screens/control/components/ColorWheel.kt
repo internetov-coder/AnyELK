@@ -96,8 +96,8 @@ fun ColorWheel(
                     )
                 }
         ) {
-            val radius = min(size.width, size.height) / 2f
-            val center = Offset(size.width / 2f, size.height / 2f)
+            val radius = min(this.size.width, this.size.height) / 2f
+            val center = Offset(this.size.width / 2f, this.size.height / 2f)
 
             // Hue ring (HSV hue 0..360).
             val hueBrush = Brush.sweepGradient(

@@ -167,7 +167,7 @@ class BleLedRepository(context: Context) {
         val sc = scanner ?: return
         val cb = scanCallback
         try {
-            if (cb != null) sc.stopScan(cb) else sc.stopScan()
+            if (cb != null) sc.stopScan(cb)
         } catch (_: Exception) {
             // Scanner may already be stopped.
         }
@@ -409,11 +409,13 @@ class BleLedRepository(context: Context) {
             }
             val result = withTimeoutOrNull(WRITE_TIMEOUT_MS) {
                 val submitted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    g.writeCharacteristic(ch, data, BluetoothGatt.WRITE_TYPE_NO_RESPONSE)
+                    g.writeCharacteristic(
+                        ch, data, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+                    )
                 } else {
                     @Suppress("DEPRECATION")
                     run {
-                        ch.writeType = BluetoothGatt.WRITE_TYPE_NO_RESPONSE
+                        ch.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
                         ch.value = data
                         g.writeCharacteristic(ch)
                     }
