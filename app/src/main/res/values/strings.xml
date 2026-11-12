@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AnyELK</string>
+
+    <!-- Navigation -->
+    <string name="nav_control">Control</string>
+    <string name="nav_devices">Devices</string>
+    <string name="nav_music">Music</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Control screen -->
+    <string name="control_title">Light control</string>
+    <string name="control_power">Power</string>
+    <string name="control_brightness">Brightness</string>
+    <string name="control_color_wheel">Color wheel</string>
+    <string name="control_presets">Color presets</string>
+    <string name="control_current_color">Selected color</string>
+    <string name="control_not_connected">Not connected to a strip</string>
+    <string name="control_connect_hint">Open the Devices tab and connect to your strip to send commands.</string>
+
+    <!-- Devices screen -->
+    <string name="devices_title">Devices</string>
+    <string name="devices_scan">Scan</string>
+    <string name="devices_scanning">Scanning…</string>
+    <string name="devices_stop_scan">Stop</string>
+    <string name="devices_empty">No devices found yet. Tap Scan to search for LED strips.</string>
+    <string name="devices_status_connected">Connected</string>
+    <string name="devices_status_connecting">Connecting…</string>
+    <string name="devices_status_disconnected">Disconnected</string>
+    <string name="devices_status_error">Error</string>
+    <string name="devices_connect">Connect</string>
+    <string name="devices_disconnect">Disconnect</string>
+    <string name="devices_rssi">Signal: %1$d dBm</string>
+    <string name="devices_unknown_name">Unknown device</string>
+    <string name="devices_permission_needed">Bluetooth permission is required to find devices.</string>
+    <string name="devices_permission_action">Grant permission</string>
+    <string name="devices_auto_connected">Reconnected to the last device</string>
+
+    <!-- Music screen -->
+    <string name="music_title">Music</string>
+    <string name="music_pick_folder">Select music folder</string>
+    <string name="music_no_folder">No folder selected yet</string>
+    <string name="music_empty_playlist">The selected folder contains no audio files.</string>
+    <string name="music_play">Play</string>
+    <string name="music_pause">Pause</string>
+    <string name="music_next">Next track</string>
+    <string name="music_prev">Previous track</string>
+    <string name="music_unknown_track">Unknown track</string>
+    <string name="music_visualizer">Visualizer</string>
+    <string name="music_bass">Bass</string>
+    <string name="music_mids">Mids</string>
+    <string name="music_highs">Highs</string>
+    <string name="music_sync_led">Send colors to strip</string>
+    <string name="music_sync_hint">Bass turns red, mids turn blue, highs turn green.</string>
+    <string name="music_visualizer_permission">Microphone permission is required for the audio visualizer.</string>
+    <string name="music_tracks_count">%1$d tracks</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_connection">Connection</string>
+    <string name="settings_auto_connect">Automatic connection</string>
+    <string name="settings_auto_connect_desc">Connect to the last used strip as soon as the app opens.</string>
+    <string name="settings_section_strip">Strip</string>
+    <string name="settings_pixel_order">Pixel order</string>
+    <string name="settings_pixel_order_desc">Linear channel sequence of your strip (RGB, GRB, …).</string>
+    <string name="settings_pixel_order_applied">Pixel order applied</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version %1$s</string>
+
+    <!-- Common -->
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_error">Error</string>
+    <string name="common_close">Close</string>
+</resources>

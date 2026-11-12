@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AnyELK</string>
+
+    <!-- Навигация -->
+    <string name="nav_control">Управление</string>
+    <string name="nav_devices">Устройства</string>
+    <string name="nav_music">Музыка</string>
+    <string name="nav_settings">Настройки</string>
+
+    <!-- Экран управления -->
+    <string name="control_title">Управление светом</string>
+    <string name="control_power">Питание</string>
+    <string name="control_brightness">Яркость</string>
+    <string name="control_color_wheel">Круг выбора цвета</string>
+    <string name="control_presets">Готовые цвета</string>
+    <string name="control_current_color">Выбранный цвет</string>
+    <string name="control_not_connected">Лента не подключена</string>
+    <string name="control_connect_hint">Откройте вкладку «Устройства» и подключитесь к ленте, чтобы отправлять команды.</string>
+
+    <!-- Экран устройств -->
+    <string name="devices_title">Устройства</string>
+    <string name="devices_scan">Поиск</string>
+    <string name="devices_scanning">Сканирование…</string>
+    <string name="devices_stop_scan">Стоп</string>
+    <string name="devices_empty">Устройства пока не найдены. Нажмите «Поиск», чтобы найти светодиодные ленты.</string>
+    <string name="devices_status_connected">Подключено</string>
+    <string name="devices_status_connecting">Подключение…</string>
+    <string name="devices_status_disconnected">Отключено</string>
+    <string name="devices_status_error">Ошибка</string>
+    <string name="devices_connect">Подключить</string>
+    <string name="devices_disconnect">Отключить</string>
+    <string name="devices_rssi">Сигнал: %1$d дБм</string>
+    <string name="devices_unknown_name">Неизвестное устройство</string>
+    <string name="devices_permission_needed">Для поиска устройств нужен доступ к Bluetooth.</string>
+    <string name="devices_permission_action">Разрешить</string>
+    <string name="devices_auto_connected">Подключение к последнему устройству</string>
+
+    <!-- Музыкальный экран -->
+    <string name="music_title">Музыка</string>
+    <string name="music_pick_folder">Выбрать папку с музыкой</string>
+    <string name="music_no_folder">Папка не выбрана</string>
+    <string name="music_empty_playlist">В выбранной папке нет аудиофайлов.</string>
+    <string name="music_play">Воспроизвести</string>
+    <string name="music_pause">Пауза</string>
+    <string name="music_next">Следующий трек</string>
+    <string name="music_prev">Предыдущий трек</string>
+    <string name="music_unknown_track">Неизвестный трек</string>
+    <string name="music_visualizer">Визуализатор</string>
+    <string name="music_bass">Низы</string>
+    <string name="music_mids">Середины</string>
+    <string name="music_highs">Верхи</string>
+    <string name="music_sync_led">Отправлять цвета на ленту</string>
+    <string name="music_sync_hint">Низы — красный, середины — синий, верхи — зелёный.</string>
+    <string name="music_visualizer_permission">Для визуализатора нужен доступ к записи звука.</string>
+    <string name="music_tracks_count">Треков: %1$d</string>
+
+    <!-- Экран настроек -->
+    <string name="settings_title">Настройки</string>
+    <string name="settings_section_connection">Подключение</string>
+    <string name="settings_auto_connect">Автоматическое подключение</string>
+    <string name="settings_auto_connect_desc">Подключаться к последней ленте сразу при запуске приложения.</string>
+    <string name="settings_section_strip">Лента</string>
+    <string name="settings_pixel_order">Порядок пикселей</string>
+    <string name="settings_pixel_order_desc">Линейная последовательность каналов вашей ленты (RGB, GRB и т. д.).</string>
+    <string name="settings_pixel_order_applied">Порядок пикселей применён</string>
+    <string name="settings_about">О приложении</string>
+    <string name="settings_version">Версия %1$s</string>
+
+    <!-- Общее -->
+    <string name="common_ok">ОК</string>
+    <string name="common_cancel">Отмена</string>
+    <string name="common_error">Ошибка</string>
+    <string name="common_close">Закрыть</string>
+</resources>
