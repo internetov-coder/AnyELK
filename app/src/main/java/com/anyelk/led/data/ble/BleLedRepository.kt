@@ -69,7 +69,7 @@ class BleLedRepository(
     private val appContext = context.applicationContext
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-    /** Current strip channel order; color bytes are remapped through it. */
+    /** Strip channel order; synced to the controller as pin-seq on connect. */
     @Volatile
     private var pixelOrder: PixelOrder = PixelOrder.GRB
 
@@ -310,8 +310,9 @@ class BleLedRepository(
 
             startSender()
             syncTime(gatt)
-            // Sync the channel order so the controller and the app agree on
-            // which payload byte drives which physical channel.
+            // Push the pin sequence [pinR, pinG, pinB] so the controller routes
+            // the logical RGB packet onto the strip's physical channels. Sent on
+            // every connect for a deterministic baseline (undoes any drift).
             sendControl(BleProtocol.pixelOrder(pixelOrder))
             startKeepAlive()
         }
@@ -398,7 +399,8 @@ class BleLedRepository(
 
     /** High-rate RGB updates: conflated + throttled inside the sender loop. */
     fun sendColor(red: Int, green: Int, blue: Int) {
-        colorChannel.trySend(BleProtocol.color(pixelOrder, red, green, blue))
+        // Logical [R, G, B] always — channel routing is the pin-seq's job.
+        colorChannel.trySend(BleProtocol.color(red, green, blue))
         startSenderIfConnected()
     }
 

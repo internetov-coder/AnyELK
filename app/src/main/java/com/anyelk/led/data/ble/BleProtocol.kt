@@ -37,16 +37,20 @@ object BleProtocol {
     fun powerOff(): ByteArray = frame(0x07, 0x04, 0x00, 0x00, 0x00, 0x02, 0x01)
 
     /**
-     * Static RGB color: 7E 07 05 03 <b0> <b1> <b2> 10 EF.
+     * Static RGB color: 7E 07 05 03 R G B 10 EF.
      *
-     * The three payload bytes follow the strip's linear pixel order: for an
-     * RGB strip b0=red, while for the common GRB hardware b0=green. Remapping
-     * here keeps every caller (presets, color wheel, music FFT) correct.
+     * The payload is ALWAYS logical [R, G, B]: the controller reads byte 4 as
+     * red regardless of wiring. Physical channel order is handled separately
+     * by the pin-sequence command (see [pixelOrder]) — remapping this packet
+     * on top of pin-seq would double-transform and swap channels.
      */
-    fun color(order: PixelOrder, red: Int, green: Int, blue: Int): ByteArray {
-        val ch = order.remap(red, green, blue)
-        return frame(0x07, 0x05, 0x03, ch[0], ch[1], ch[2], 0x10)
-    }
+    fun color(red: Int, green: Int, blue: Int): ByteArray = frame(
+        0x07, 0x05, 0x03,
+        red.coerceIn(0, 255),
+        green.coerceIn(0, 255),
+        blue.coerceIn(0, 255),
+        0x10
+    )
 
     /** Brightness 0-100%: 7E 04 01 <pct> 01 FF 02 01 EF */
     fun brightness(percent: Int): ByteArray = frame(
@@ -62,14 +66,18 @@ object BleProtocol {
     fun effect(id: Int): ByteArray = frame(0x07, 0x03, id, 0x03, 0xFF, 0xFF, 0x00)
 
     /**
-     * Linear pixel/channel order: 7E 06 81 <pin0> <pin1> <pin2> FF 00 EF.
-     * Default from the stock app is 01 02 03 (RGB), packed as int 0x010203.
+     * Pin sequence: 7E 06 81 <pinR> <pinG> <pinB> FF 00 EF.
+     *
+     * Semantics taken from the stock app's PinSequenceActivity (decompiled):
+     * the three bytes are [pin of RED, pin of GREEN, pin of BLUE] (1-based).
+     * The controller routes the logical RGB packet onto those pins, which is
+     * how GRB-wired strips get corrected — the color packet itself must stay
+     * logical [R, G, B].
      */
-    fun pixelOrder(order: PixelOrder): ByteArray = frame(
-        0x06, 0x81,
-        order.pins[0], order.pins[1], order.pins[2],
-        0xFF, 0x00
-    )
+    fun pixelOrder(order: PixelOrder): ByteArray {
+        val p = order.pins
+        return frame(0x06, 0x81, p[0], p[1], p[2], 0xFF, 0x00)
+    }
 
     /**
      * Time sync sent by the stock app on every connection:
@@ -87,30 +95,26 @@ object BleProtocol {
         )
 }
 
-/** Linear channel sequence of the strip. Pins match the stock app defaults. */
+/**
+ * Linear channel sequence of the strip: [pinR, pinG, pinB] — the 1-based pin
+ * that carries each logical color, matching the stock PinSequenceActivity UI
+ * (row = color, column = pin, send = [pinR+1, pinG+1, pinB+1]).
+ *
+ * GRB (pin1=green, pin2=red) = [02, 01, 03] — verified against hardware that
+ * lit green for the stock RGB command.
+ */
 enum class PixelOrder(val pins: IntArray) {
     RGB(intArrayOf(0x01, 0x02, 0x03)),
     RBG(intArrayOf(0x01, 0x03, 0x02)),
     GRB(intArrayOf(0x02, 0x01, 0x03)),
-    GBR(intArrayOf(0x02, 0x03, 0x01)),
-    BRG(intArrayOf(0x03, 0x01, 0x02)),
+    GBR(intArrayOf(0x03, 0x01, 0x02)),
+    BRG(intArrayOf(0x02, 0x03, 0x01)),
     BGR(intArrayOf(0x03, 0x02, 0x01));
-
-    /** Maps logical (r, g, b) onto the byte order the strip expects. */
-    fun remap(red: Int, green: Int, blue: Int): IntArray = when (this) {
-        RGB -> intArrayOf(red, green, blue)
-        RBG -> intArrayOf(red, blue, green)
-        GRB -> intArrayOf(green, red, blue)
-        GBR -> intArrayOf(green, blue, red)
-        BRG -> intArrayOf(blue, red, green)
-        BGR -> intArrayOf(blue, green, red)
-    }
 
     companion object {
         /**
-         * Default is GRB: the common ELK-BLEDOB clones from AliExpress wire
-         * WS2812-style dies in green-first order (verified against hardware
-         * where the stock RGB command lit green).
+         * Default is GRB: the common ELK-BLEDOB clones wire WS2812-style
+         * dies green-first (verified: stock RGB command lit the green die).
          */
         fun fromName(name: String?): PixelOrder =
             entries.firstOrNull { it.name == name } ?: GRB
