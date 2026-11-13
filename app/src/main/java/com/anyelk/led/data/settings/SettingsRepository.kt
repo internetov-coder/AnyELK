@@ -15,7 +15,7 @@ data class AppSettings(
     val autoConnect: Boolean = true,
     val lastDeviceAddress: String? = null,
     val lastDeviceName: String? = null,
-    val pixelOrder: PixelOrder = PixelOrder.RGB,
+    val pixelOrder: PixelOrder = PixelOrder.GRB,
     val musicTreeUri: String? = null
 )
 

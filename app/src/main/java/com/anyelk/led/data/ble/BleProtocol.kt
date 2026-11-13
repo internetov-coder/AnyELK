@@ -36,14 +36,17 @@ object BleProtocol {
     /** Power off: 7E 07 04 00 00 00 02 01 EF */
     fun powerOff(): ByteArray = frame(0x07, 0x04, 0x00, 0x00, 0x00, 0x02, 0x01)
 
-    /** Static RGB color: 7E 07 05 03 R G B 10 EF */
-    fun color(red: Int, green: Int, blue: Int): ByteArray = frame(
-        0x07, 0x05, 0x03,
-        red.coerceIn(0, 255),
-        green.coerceIn(0, 255),
-        blue.coerceIn(0, 255),
-        0x10
-    )
+    /**
+     * Static RGB color: 7E 07 05 03 <b0> <b1> <b2> 10 EF.
+     *
+     * The three payload bytes follow the strip's linear pixel order: for an
+     * RGB strip b0=red, while for the common GRB hardware b0=green. Remapping
+     * here keeps every caller (presets, color wheel, music FFT) correct.
+     */
+    fun color(order: PixelOrder, red: Int, green: Int, blue: Int): ByteArray {
+        val ch = order.remap(red, green, blue)
+        return frame(0x07, 0x05, 0x03, ch[0], ch[1], ch[2], 0x10)
+    }
 
     /** Brightness 0-100%: 7E 04 01 <pct> 01 FF 02 01 EF */
     fun brightness(percent: Int): ByteArray = frame(
@@ -93,8 +96,23 @@ enum class PixelOrder(val pins: IntArray) {
     BRG(intArrayOf(0x03, 0x01, 0x02)),
     BGR(intArrayOf(0x03, 0x02, 0x01));
 
+    /** Maps logical (r, g, b) onto the byte order the strip expects. */
+    fun remap(red: Int, green: Int, blue: Int): IntArray = when (this) {
+        RGB -> intArrayOf(red, green, blue)
+        RBG -> intArrayOf(red, blue, green)
+        GRB -> intArrayOf(green, red, blue)
+        GBR -> intArrayOf(green, blue, red)
+        BRG -> intArrayOf(blue, red, green)
+        BGR -> intArrayOf(blue, green, red)
+    }
+
     companion object {
+        /**
+         * Default is GRB: the common ELK-BLEDOB clones from AliExpress wire
+         * WS2812-style dies in green-first order (verified against hardware
+         * where the stock RGB command lit green).
+         */
         fun fromName(name: String?): PixelOrder =
-            entries.firstOrNull { it.name == name } ?: RGB
+            entries.firstOrNull { it.name == name } ?: GRB
     }
 }

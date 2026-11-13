@@ -28,7 +28,7 @@ data class ControlUiState(
     /** Brightness percent, 1..100. */
     val brightness: Int = 100,
     val color: Color = Color.Red,
-    val pixelOrder: PixelOrder = PixelOrder.RGB
+    val pixelOrder: PixelOrder = PixelOrder.GRB
 )
 
 class ControlViewModel(

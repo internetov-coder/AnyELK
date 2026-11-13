@@ -61,10 +61,17 @@ sealed class LedConnectionState {
  *  - color lane (RGB): conflated (only the newest value survives) and
  *    throttled to ~30 FPS so a music visualizer cannot flood the GATT queue.
  */
-class BleLedRepository(context: Context) {
+class BleLedRepository(
+    context: Context,
+    private val settings: com.anyelk.led.data.settings.SettingsRepository
+) {
 
     private val appContext = context.applicationContext
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
+    /** Current strip channel order; color bytes are remapped through it. */
+    @Volatile
+    private var pixelOrder: PixelOrder = PixelOrder.GRB
 
     private val bluetoothManager =
         appContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -94,6 +101,12 @@ class BleLedRepository(context: Context) {
     private var keepAliveJob: kotlinx.coroutines.Job? = null
 
     private val writeSignal = Channel<Unit>(Channel.CONFLATED)
+
+    init {
+        scope.launch {
+            settings.settings.collect { pixelOrder = it.pixelOrder }
+        }
+    }
 
     // ------------------------------------------------------------------ scan
 
@@ -297,6 +310,9 @@ class BleLedRepository(context: Context) {
 
             startSender()
             syncTime(gatt)
+            // Sync the channel order so the controller and the app agree on
+            // which payload byte drives which physical channel.
+            sendControl(BleProtocol.pixelOrder(pixelOrder))
             startKeepAlive()
         }
 
@@ -382,7 +398,7 @@ class BleLedRepository(context: Context) {
 
     /** High-rate RGB updates: conflated + throttled inside the sender loop. */
     fun sendColor(red: Int, green: Int, blue: Int) {
-        colorChannel.trySend(BleProtocol.color(red, green, blue))
+        colorChannel.trySend(BleProtocol.color(pixelOrder, red, green, blue))
         startSenderIfConnected()
     }
 

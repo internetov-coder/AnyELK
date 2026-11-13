@@ -12,7 +12,9 @@ object ServiceLocator {
         private set
 
     val settingsRepository: SettingsRepository by lazy { SettingsRepository(appContext) }
-    val bleRepository: BleLedRepository by lazy { BleLedRepository(appContext) }
+    val bleRepository: BleLedRepository by lazy {
+        BleLedRepository(appContext, settingsRepository)
+    }
     val musicRepository: MusicRepository by lazy { MusicRepository(appContext) }
     val musicController: MusicController by lazy { MusicController(appContext) }
     val visualizerManager: AudioVisualizerManager by lazy { AudioVisualizerManager() }
