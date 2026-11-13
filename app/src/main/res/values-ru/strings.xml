@@ -52,6 +52,8 @@
     <string name="music_highs">Верхи</string>
     <string name="music_sync_led">Отправлять цвета на ленту</string>
     <string name="music_sync_hint">Низы — красный, середины — синий, верхи — зелёный.</string>
+    <string name="music_visualizer_off">Визуализатор выключен</string>
+    <string name="music_enable_visualizer">Включить визуализатор</string>
     <string name="music_visualizer_permission">Для визуализатора нужен доступ к записи звука.</string>
     <string name="music_tracks_count">Треков: %1$d</string>
 

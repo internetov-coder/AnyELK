@@ -52,6 +52,8 @@
     <string name="music_highs">Highs</string>
     <string name="music_sync_led">Send colors to strip</string>
     <string name="music_sync_hint">Bass turns red, mids turn blue, highs turn green.</string>
+    <string name="music_visualizer_off">Visualizer is off</string>
+    <string name="music_enable_visualizer">Enable visualizer</string>
     <string name="music_visualizer_permission">Microphone permission is required for the audio visualizer.</string>
     <string name="music_tracks_count">%1$d tracks</string>
 

@@ -1,7 +1,6 @@
 package com.anyelk.led.ui.screens.music
 
 import android.app.Application
-import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,9 +41,6 @@ class MusicViewModel(app: Application) : AndroidViewModel(app) {
     private val _syncToLed = MutableStateFlow(false)
     private val _treeUri = MutableStateFlow<Uri?>(null)
     private val _tracks = MutableStateFlow<List<Track>>(emptyList())
-    private val _message = MutableStateFlow<String?>(null)
-
-    val message: StateFlow<String?> = _message.asStateFlow()
 
     private var syncJob: kotlinx.coroutines.Job? = null
 
@@ -74,8 +70,10 @@ class MusicViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             playback.collect { pb ->
                 _uiState.value = _uiState.value.copy(playback = pb, tracks = pb.tracks)
-                // Attach the FFT visualizer as soon as the player reports a session.
-                if (pb.audioSessionId > 0 && _syncToLed.value) {
+                // Keep the FFT visualizer attached whenever the player reports a
+                // session, so the on-screen spectrum works independently of the
+                // "send colors to strip" toggle.
+                if (pb.audioSessionId > 0) {
                     visualizer.attach(pb.audioSessionId)
                 }
             }
@@ -110,13 +108,12 @@ class MusicViewModel(app: Application) : AndroidViewModel(app) {
                 treeUri = uri
             )
             if (tracks.isEmpty()) {
-                _message.value = "empty"
+                // Empty folder state is rendered from treeUri/tracks in the UI.
             } else {
                 controller.setTracksIfChanged(tracks, 0)
             }
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(scanningFolder = false)
-            _message.value = e.message ?: "error"
         }
     }
 
@@ -135,10 +132,19 @@ class MusicViewModel(app: Application) : AndroidViewModel(app) {
             if (session > 0) visualizer.attach(session)
             startLedSync()
         } else {
+            // Stop streaming to the strip but keep the visualizer alive so the
+            // on-screen spectrum bars continue to animate.
             syncJob?.cancel()
             syncJob = null
-            visualizer.detach()
         }
+    }
+
+    /** Retry attaching after RECORD_AUDIO was granted from the sync toggle path. */
+    fun onVisualizerPermissionResult(granted: Boolean) {
+        if (!granted) return
+        val session = controller.state.value.audioSessionId
+        if (session > 0) visualizer.attach(session)
+        if (_syncToLed.value) startLedSync()
     }
 
     private fun startLedSync() {
@@ -151,21 +157,6 @@ class MusicViewModel(app: Application) : AndroidViewModel(app) {
             }
         }
     }
-
-    fun onVisualizerPermissionResult(granted: Boolean) {
-        if (granted) {
-            setSyncToLed(true)
-        } else {
-            _message.value = "visualizer_permission"
-        }
-    }
-
-    fun consumeMessage() {
-        _message.value = null
-    }
-
-    fun currentTreeIntent(): Intent =
-        Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
 
     override fun onCleared() {
         syncJob?.cancel()

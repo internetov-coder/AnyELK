@@ -73,7 +73,7 @@ fun MusicScreen(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri -> viewModel.onFolderPicked(uri) }
 
-    val audioPermissionLauncher = rememberLauncherForActivityResult(
+    val visualizerPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted -> viewModel.onVisualizerPermissionResult(granted) }
 
@@ -235,13 +235,7 @@ fun MusicScreen(
                     )
                     Switch(
                         checked = uiState.syncToLed,
-                        onCheckedChange = { enabled ->
-                            if (enabled) {
-                                audioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                            } else {
-                                viewModel.setSyncToLed(false)
-                            }
-                        }
+                        onCheckedChange = viewModel::setSyncToLed
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
@@ -279,7 +273,7 @@ fun MusicScreen(
                             .size(44.dp)
                             .clip(CircleShape)
                             .background(
-                                if (visualizer.active && uiState.syncToLed) {
+                                if (visualizer.active) {
                                     Color(
                                         red = visualizer.red / 255f,
                                         green = visualizer.green / 255f,
@@ -292,20 +286,33 @@ fun MusicScreen(
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
-                        text = if (!uiState.syncToLed) {
-                            stringResource(R.string.music_sync_led)
-                        } else if (!visualizer.active) {
-                            stringResource(R.string.music_visualizer_permission)
-                        } else {
-                            String.format(
+                        text = when {
+                            visualizer.active -> String.format(
                                 Locale.US,
                                 "R %3d   G %3d   B %3d",
                                 visualizer.red, visualizer.green, visualizer.blue
                             )
+                            playback.audioSessionId > 0 ->
+                                stringResource(R.string.music_visualizer_permission)
+                            else -> stringResource(R.string.music_visualizer_off)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+
+                if (!visualizer.active && playback.audioSessionId > 0) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedButton(
+                        onClick = {
+                            visualizerPermissionLauncher.launch(
+                                Manifest.permission.RECORD_AUDIO
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.music_enable_visualizer))
+                    }
                 }
             }
         }
